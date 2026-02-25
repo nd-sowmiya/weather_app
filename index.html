@@ -12,12 +12,8 @@
         <input type="text" id="cityInput" placeholder="Enter city name...">
         <button id="searchBtn">Get Weather</button>
     </div>
-
-    <!-- Messages -->
     <p id="loading">Fetching data...</p>
     <p id="error"></p>
-
-    <!-- Weather result -->
     <div id="weatherResult">
         <h2 id="cityName"></h2>
         <p>Condition: <span id="condition"></span></p>
@@ -25,7 +21,6 @@
         <p>Humidity: <span id="humidity"></span>%</p>
         <p>Wind Speed: <span id="wind"></span> m/s</p>
     </div>
-
     <script>
         const apiKey = "36102859a6540cf72095cd7cb2fd3b25"; 
         const baseUrl = "https://api.openweathermap.org/data/2.5/weather";
@@ -44,7 +39,6 @@
             resultDiv.style.display = 'none';
             loadingP.style.display = 'block';
             searchBtn.disabled = true;
-
             try {
                 const response = await fetch(`${baseUrl}?q=${city}&units=metric&appid=${apiKey}`);
                 if (!response.ok) {
@@ -59,7 +53,6 @@
                 searchBtn.disabled = false;
             }
         }
-
         function displayData(data) {
             const condition = data.weather?.[0]?.description || "N/A";
             const temp = data.main?.temp ? Math.round(data.main.temp) : "N/A";
@@ -71,16 +64,13 @@
             document.getElementById('temp').textContent = temp;
             document.getElementById('humidity').textContent = humidity;
             document.getElementById('wind').textContent = wind;
-
             resultDiv.style.display = 'block';
         }
-
         function showError(msg) {
             errorP.textContent = msg;
             errorP.style.display = 'block';
             loadingP.style.display = 'none';
         }
-
         searchBtn.addEventListener('click', () => fetchWeather(cityInput.value.trim()));
         cityInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') fetchWeather(cityInput.value.trim());
