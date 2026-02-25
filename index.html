@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Weather Service</h1>
+    <div>
+        <input type="text" id="cityInput" placeholder="Enter city name...">
+        <button id="searchBtn">Get Weather</button>
+    </div>
+
+    <!-- Messages -->
+    <p id="loading">Fetching data...</p>
+    <p id="error"></p>
+
+    <!-- Weather result -->
+    <div id="weatherResult">
+        <h2 id="cityName"></h2>
+        <p>Condition: <span id="condition"></span></p>
+        <p>Temperature: <span id="temp"></span>°C</p>
+        <p>Humidity: <span id="humidity"></span>%</p>
+        <p>Wind Speed: <span id="wind"></span> m/s</p>
+    </div>
+
+    <script>
+        const apiKey = "36102859a6540cf72095cd7cb2fd3b25"; 
+        const baseUrl = "https://api.openweathermap.org/data/2.5/weather";
+        const cityInput = document.getElementById('cityInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultDiv = document.getElementById('weatherResult');
+        const errorP = document.getElementById('error');
+        const loadingP = document.getElementById('loading');
+
+        async function fetchWeather(city) {
+            if (!city) {
+                showError("Please enter a city name.");
+                return;
+            }
+            errorP.style.display = 'none';
+            resultDiv.style.display = 'none';
+            loadingP.style.display = 'block';
+            searchBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${baseUrl}?q=${city}&units=metric&appid=${apiKey}`);
+                if (!response.ok) {
+                    throw new Error("City not found or API limit reached.");
+                }
+                const data = await response.json();
+                displayData(data);
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                loadingP.style.display = 'none';
+                searchBtn.disabled = false;
+            }
+        }
+
+        function displayData(data) {
+            const condition = data.weather?.[0]?.description || "N/A";
+            const temp = data.main?.temp ? Math.round(data.main.temp) : "N/A";
+            const humidity = data.main?.humidity || "N/A";
+            const wind = data.wind?.speed || "N/A";
+
+            document.getElementById('cityName').textContent = data.name;
+            document.getElementById('condition').textContent = condition;
+            document.getElementById('temp').textContent = temp;
+            document.getElementById('humidity').textContent = humidity;
+            document.getElementById('wind').textContent = wind;
+
+            resultDiv.style.display = 'block';
+        }
+
+        function showError(msg) {
+            errorP.textContent = msg;
+            errorP.style.display = 'block';
+            loadingP.style.display = 'none';
+        }
+
+        searchBtn.addEventListener('click', () => fetchWeather(cityInput.value.trim()));
+        cityInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchWeather(cityInput.value.trim());
+        });
+    </script>
+</body>
+</html>
